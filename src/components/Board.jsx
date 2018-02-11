@@ -9,12 +9,13 @@ class Board extends Component {
 
         this.state = {
             squares: Array(9).fill(null),
-            xIsNext: true
+            xIsNext: true,
+            winner: null
         }
     }
 
     handleClick(index) {
-        if (!this.state.squares[index]) {
+        if (!this.state.squares[index] && !this.state.winner) {
             const squares = this.state.squares.slice();
 
             squares[index] = (this.state.xIsNext ? 'X' : 'O');
@@ -23,6 +24,8 @@ class Board extends Component {
                 squares,
                 xIsNext: !this.state.xIsNext
             });
+
+            this.calculateWinner(squares);
         }
     }
 
@@ -33,8 +36,35 @@ class Board extends Component {
                 />);
     }
 
+    calculateWinner(squares) {
+        const lines = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        lines.forEach((line, index) => {
+            const [a, b, c] = line;
+
+            if (squares[a] && (squares[a] === squares[b]) && (squares[a] === squares[c])) {
+                this.setState({winner: squares[a]});
+            }
+        });
+    }
+
     render() {
-        const status = "Next player: " + (this.state.xIsNext ? 'X' : 'O');
+        let status; 
+
+        if (this.state.winner) {
+            status = `Winner: ${this.state.winner}`;
+        } else {
+            status = `Next player: ${(this.state.xIsNext ? 'X' : 'O')}`;
+        }
 
         return (
             <div>
